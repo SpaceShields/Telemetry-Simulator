@@ -1,10 +1,3 @@
-Absolutely — here’s a **fresh, professional, mission-focused `README.md`** tailored to your CCSDS-based Raspberry Pi telemetry simulator and real-time web dashboard.
-
----
-
-## 📘 `README.md`
-
-```markdown
 # 🛰️ TLI-Telemetry-Simulator
 
 A real-time telemetry simulation framework that emulates spacecraft downlink using CCSDS-compliant packets from a Raspberry Pi-5 "spacecraft" to a mission control ground station dashboard.
@@ -48,8 +41,7 @@ TLI-Telemetry-Simulator/
 ├── .env                       # IP/port configuration
 ├── requirements.txt
 └── README.md
-
-````
+```
 
 ---
 
