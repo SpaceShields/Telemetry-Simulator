@@ -24,11 +24,11 @@ This project simulates real-time spacecraft telemetry from a Raspberry Pi system
 
 TLI-Telemetry-Simulator/
 ├── src/                        # Core packet encoding and Pi telemetry
-│   ├── pi\_reader.py
+│   ├── pi_reader.py
 │   |── receiver.py
 │   |── transmitter.py
-│   ├── packet\_encoder.py
-│   └── packet\_decoder.py
+│   ├── packet_encoder.py
+│   └── packet_decoder.py
 │
 ├── dashboard/                  # Mission control dashboard (Flask)
 │   ├── server.py
@@ -36,8 +36,8 @@ TLI-Telemetry-Simulator/
 │   │   └── dashboard.html
 │   └── static/                 # Optional: custom CSS/JS
 │
-├── run\_transmitter.py         # RPi telemetry loop
-├── run\_groundstation.py       # CLI receiver loop
+├── run_transmitter.py         # RPi telemetry loop
+├── run_groundstation.py       # CLI receiver loop
 ├── .env                       # IP/port configuration
 ├── requirements.txt
 └── README.md
