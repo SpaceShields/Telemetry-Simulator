@@ -9,7 +9,7 @@ eventlet.monkey_patch()
 
 
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
-from ground_station.packet_decoder import decode_ccsds_packet, print_decoded_packet
+from src.packet_decoder import decode_ccsds_packet, print_decoded_packet
 
 app = Flask(__name__)
 socketio = SocketIO(app)

@@ -32,6 +32,8 @@ This project simulates real-time spacecraft telemetry from a Raspberry Pi system
 TLI-Telemetry-Simulator/
 ├── src/                        # Core packet encoding and Pi telemetry
 │   ├── pi\_reader.py
+│   |── receiver.py
+│   |── transmitter.py
 │   ├── packet\_encoder.py
 │   └── packet\_decoder.py
 │
@@ -40,9 +42,6 @@ TLI-Telemetry-Simulator/
 │   ├── templates/
 │   │   └── dashboard.html
 │   └── static/                 # Optional: custom CSS/JS
-│
-├── ground\_station/            # CLI receiver + decoder
-│   └── receiver.py
 │
 ├── run\_transmitter.py         # RPi telemetry loop
 ├── run\_groundstation.py       # CLI receiver loop
@@ -95,6 +94,8 @@ python run_groundstation.py
 cd dashboard
 python server.py
 ```
+
+** Web dashboard and CLI receiver should not be ran at the same time
 
 Then open [http://localhost:8000](http://localhost:8000) in your browser.
 
