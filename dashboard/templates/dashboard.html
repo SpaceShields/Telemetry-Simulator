@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Mission Control Dashboard</title>
+  <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+  <style>
+    body { font-family: monospace; background: #111; }
+    .panel { padding: 20px; margin: 10px; border: 1px solid white; color:white; border-radius: 50px; }
+    .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+    h1 { color: #0ff; }
+  </style>
+</head>
+<body>
+  <h1>🚀 Mission Control: Pi Telemetry</h1>
+  <div class="grid">
+    <div class="panel" id="cpu_temp"></div>
+    <div class="panel" id="cpu_usage"></div>
+    <div class="panel" id="ram"></div>
+    <div class="panel" id="disk"></div>
+    <div class="panel" id="fan"></div>
+    <div class="panel" id="uptime"></div>
+  </div>
+
+  <script>
+    const socket = io();
+    socket.on('telemetry', data => {
+      const p = data.payload;
+      document.getElementById("cpu_temp").textContent = `CPU Temp: ${p.cpu_temp.toFixed(2)} °C`;
+      document.getElementById("cpu_usage").textContent = `CPU Usage: ${p.cpu_usage.toFixed(2)} %`;
+      document.getElementById("ram").textContent = `RAM Usage: ${p.ram.toFixed(2)} %`;
+      document.getElementById("disk").textContent = `Disk Usage: ${p.disk_usage.toFixed(2)} %`;
+      document.getElementById("fan").textContent = `Fan Speed: ${p.fan_speed.toFixed(2)} RPM`;
+      const u = p.uptime;
+      const h = Math.floor(u / 3600);
+      const m = Math.floor((u % 3600) / 60);
+      const s = Math.floor(u % 60);
+      document.getElementById("uptime").textContent = `Uptime: ${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+    });
+  </script>
+</body>
+</html>

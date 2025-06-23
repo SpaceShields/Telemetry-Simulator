@@ -52,29 +52,29 @@ def decode_ccsds_packet(packet: bytes) -> dict:
     }
 
 def print_decoded_packet(decoded: dict):
-    print("\n=== [CCSDS PACKET RECEIVED] ===")
+    print("\n=== [CCSDS PACKET RECEIVED] ===", flush=True)
 
-    print("[PRIMARY HEADER]")
+    print("[PRIMARY HEADER]", flush=True)
     for k, v in decoded["primary"].items():
-        print(f"  {k:<18}: {v}")
+        print(f"  {k:<18}: {v}", flush=True)
 
-    print("\n[SECONDARY HEADER]")
+    print("\n[SECONDARY HEADER]", flush=True)
     for k, v in decoded["secondary"].items():
-        print(f"  {k:<15}: {v}")
+        print(f"  {k:<15}: {v}", flush=True)
 
-    print("\n[PAYLOAD]")
+    print("\n[PAYLOAD]", flush=True)
     payload = decoded["payload"]
-    print(f"  CPU Temp          : {payload['cpu_temp']:.2f} C")
-    print(f"  CPU Frequency     : {payload['cpu_freq']:.2f} MHz")
-    print(f"  CPU Usage         : {payload['cpu_usage']:.2f} %")
-    print(f"  RAM Usage         : {payload['ram']:.2f} %")
-    print(f"  Disk Usage        : {payload['disk_usage']:.2f} %")
-    print(f"  Fan Speed         : {payload['fan_speed']:.2f} RPM")
+    print(f"  CPU Temp          : {payload['cpu_temp']:.2f} C", flush=True)
+    print(f"  CPU Frequency     : {payload['cpu_freq']:.2f} MHz", flush=True)
+    print(f"  CPU Usage         : {payload['cpu_usage']:.2f} %", flush=True)
+    print(f"  RAM Usage         : {payload['ram']:.2f} %", flush=True)
+    print(f"  Disk Usage        : {payload['disk_usage']:.2f} %", flush=True)
+    print(f"  Fan Speed         : {payload['fan_speed']:.2f} RPM", flush=True)
     
     # Convert uptime to HH:MM:SS
     uptime_sec = payload["uptime"]
     hrs, rem = divmod(uptime_sec, 3600)
     mins, secs = divmod(rem, 60)
-    print(f"  Uptime            : {int(hrs):02}:{int(mins):02}:{int(secs):02}")
+    print(f"  Uptime            : {int(hrs):02}:{int(mins):02}:{int(secs):02}", flush=True)
 
-    print("=" * 40)
+    print("=" * 40, flush=True)
