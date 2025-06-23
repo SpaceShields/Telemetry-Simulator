@@ -6,15 +6,15 @@ Built for rapid prototyping, operator visualization, and low-cost flight-like te
 
 ---
 
-## 🚀 Overview
+## Overview
 
 This project simulates real-time spacecraft telemetry from a Raspberry Pi system using realistic packet encoding, UDP downlink, and a Flask-based mission control dashboard with a modern web interface.
 
-- 🔧 Encodes and transmits CCSDS-formatted packets
-- 🧠 Transmits real Pi system telemetry (CPU temp, RAM, fan speed, uptime)
-- 📡 Streams data over UDP from spacecraft to ground
-- 📊 Decodes and displays live telemetry in a mission-style dashboard
-- 🧱 Modular design for extension to multiple subsystems
+- Encodes and transmits CCSDS-formatted packets
+- Transmits real Pi system telemetry (CPU temp, RAM, fan speed, uptime)
+- Streams data over UDP from spacecraft to ground
+- Decodes and displays live telemetry in a mission-style dashboard
+- Modular design for extension to multiple subsystems
 
 ---
 
@@ -68,19 +68,19 @@ GROUND_PORT=5005
 
 ## 🔄 Usage
 
-### ▶️ Transmit Telemetry from RPi
+### Transmit Telemetry from RPi
 
 ```bash
 python run_transmitter.py
 ```
 
-### 📡 Receive via CLI
+### Receive via CLI
 
 ```bash
 python run_groundstation.py
 ```
 
-### 🌐 Run Web Dashboard
+### Run Web Dashboard
 
 ```bash
 cd dashboard
