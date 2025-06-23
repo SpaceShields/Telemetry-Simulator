@@ -27,8 +27,20 @@ def encode_secondary_header(row: dict) -> bytes:
     return struct.pack('>I', timestamp)
 
 def encode_payload(row: dict) -> bytes:
-    pass
+    fields = [
+        float(row['battery_voltage']),
+        float(row['battery_charge']),
+        float(row['battery_temp']),
+        float(row['attitude_qw']),
+        float(row['attitude_qx']),
+        float(row['attitude_qy']),
+        float(row['attitude_qz']),
+    ]
+    return struct.pack('>fffffff', *fields)
 
-def encode_ccsds_packet(row: dict, seq_count: int) -> bytes:
-    pass
-
+def encode_ccsds_packet(row: dict, apid: int, seq_count: int) -> bytes:
+    payload = encode_payload(row)
+    sec_header = encode_secondary_header(row)
+    packet_length = len(sec_header) + len(payload)
+    primary = encode_primary_header(apid, seq_count, packet_length)
+    return primary + sec_header + payload
