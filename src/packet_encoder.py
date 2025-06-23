@@ -1,8 +1,8 @@
 import struct
 from datetime import datetime, timedelta
 
-# Assume simulation starts at a known datetime (TLI event time, etc.)
-mission_start = datetime(2025, 6, 21, 0, 0, 0)
+# # Assume simulation starts at a known datetime (TLI event time, etc.)
+# mission_start = datetime(2025, 6, 21, 0, 0, 0)
 
 def encode_primary_header(apid: int, seq_count: int, payload_length: int) -> bytes:
     version = 0         # 3 bits
@@ -20,27 +20,25 @@ def encode_primary_header(apid: int, seq_count: int, payload_length: int) -> byt
 
     return struct.pack('>HHH', first_2_bytes, second_2_bytes, third_2_bytes)
 
-def encode_secondary_header(row: dict) -> bytes:
-    rel_seconds = int(row['timestamp'])
-    absolute_time = mission_start + timedelta(seconds=rel_seconds)
-    timestamp = int(absolute_time.timestamp())
+def encode_secondary_header() -> bytes:
+    timestamp = int(datetime.now().timestamp())
     return struct.pack('>I', timestamp)
 
-def encode_payload(row: dict) -> bytes:
-    fields = [
-        float(row['battery_voltage']),
-        float(row['battery_charge']),
-        float(row['battery_temp']),
-        float(row['attitude_qw']),
-        float(row['attitude_qx']),
-        float(row['attitude_qy']),
-        float(row['attitude_qz']),
-    ]
-    return struct.pack('>fffffff', *fields)
+def encode_payload(data: dict) -> bytes:
+    return struct.pack(
+        ">ffffffI",
+        data["cpu_temp"],
+        data["cpu_freq"],
+        data["cpu_usage"],
+        data["ram"],
+        data["disk_usage"],
+        data["fan_speed"],
+        data["uptime"]
+    )
 
-def encode_ccsds_packet(row: dict, apid: int, seq_count: int) -> bytes:
-    payload = encode_payload(row)
-    sec_header = encode_secondary_header(row)
+def encode_ccsds_packet(data: dict, apid: int, seq_count: int) -> bytes:
+    payload = encode_payload(data)
+    sec_header = encode_secondary_header()
     packet_length = len(sec_header) + len(payload)
     primary = encode_primary_header(apid, seq_count, packet_length)
     return primary + sec_header + payload
