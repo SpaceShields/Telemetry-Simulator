@@ -58,8 +58,8 @@ pip install -r requirements.txt
 Create a `.env` in the root with:
 
 ```env
-GROUND_IP=192.168.1.100
-GROUND_PORT=5005
+GROUND_IP=[YOUR DESIRED RECEIVER IP]
+GROUND_PORT=[YOUR DESIRED PORT | DEFAULT=5005]
 ```
 
 > Your Pi must send to this IP and port.
