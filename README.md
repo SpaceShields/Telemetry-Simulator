@@ -1,4 +1,4 @@
-# 🛰️ TLI-Telemetry-Simulator
+# 🛰️Telemetry-Simulator
 
 A real-time telemetry simulation framework that emulates spacecraft downlink using CCSDS-compliant packets from a Raspberry Pi-5 "spacecraft" to a mission control ground station dashboard.
 
