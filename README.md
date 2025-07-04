@@ -123,8 +123,3 @@ Payload includes:
 MIT — Use freely for simulation, research, and flight prototyping.
 
 ```
-
----
-
-Let me know if you'd like a version tailored for public open-source distribution or a stripped-down version for internal engineering team use.
-```
