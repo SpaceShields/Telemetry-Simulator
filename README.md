@@ -121,5 +121,3 @@ Payload includes:
 ## 📜 License
 
 MIT — Use freely for simulation, research, and flight prototyping.
-
-```
