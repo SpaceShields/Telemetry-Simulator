@@ -31,11 +31,6 @@ def get_cdh_telemetry():
     software_version = 1  # Placeholder for software version
     event_flags = 0b00000000  # Placeholder for event flags
 
-    # Round values to appropriate precision
-    temp = round(temp, 2)
-    freq = round(freq, 1)
-    util = round(util, 1)
-
     return {
         "processor_temp": temp,
         "processor_freq": freq,

@@ -1,8 +1,7 @@
 import struct
 from src.ccsds import time, crc, apid
 from src.subsystems import cdh, comms, power, propulsion, thermal, adcs, payload
-import sys
-sys.path.append("src")
+
 
 """
 Purpose of this file: This file contains the implementation of the CCSDS encoder.
@@ -24,6 +23,7 @@ CCSDS 133.0-B (telemetry source packets)
 # B: uint8
 # B: uint8
 CDH_STRUCT_FORMAT = ">fffBBfIHBB"
+POWER_STRUCT_FORMAT = ">ffffffffBB"
 
 def encode_ccsds_cdh_payload(data: dict) -> bytes:
     """
@@ -67,6 +67,52 @@ def encode_ccsds_cdh_payload(data: dict) -> bytes:
         watchdog_counter,
         software_version,
         event_flags
+    )
+    
+    return payload
+
+def encode_ccsds_power_payload(data: dict) -> bytes:
+    """
+    Encodes Power telemetry data into a CCSDS-compliant payload.
+    
+    The struct format is:
+        bus_voltage         -> float
+        bus_current         -> float
+        battery_voltage     -> float
+        battery_current     -> float
+        battery_temp        -> float
+        state_of_charge     -> float
+        solar_array_current -> float
+        solar_array_voltage -> float
+        eps_mode            -> uint8
+        fault_flags         -> uint8
+    """
+    
+    # validate/normalize inputs
+    bus_voltage = float(data['bus_voltage'])
+    bus_current = float(data['bus_current'])
+    battery_voltage = float(data['battery_voltage'])
+    battery_current = float(data['battery_current'])
+    battery_temp = float(data['battery_temp'])
+    state_of_charge = float(data['state_of_charge'])
+    solar_array_current = float(data['solar_array_current'])
+    solar_array_voltage = float(data['solar_array_voltage'])
+    eps_mode = int(data['eps_mode'])  # 0–5
+    fault_flags = int(data['fault_flags'])  # bitfield, 0–255
+    
+    # pack it all in one shot
+    payload = struct.pack(
+        POWER_STRUCT_FORMAT,
+        bus_voltage,
+        bus_current,
+        battery_voltage,
+        battery_current,
+        battery_temp,
+        state_of_charge,
+        solar_array_current,
+        solar_array_voltage,
+        eps_mode,
+        fault_flags
     )
     
     return payload
@@ -123,22 +169,4 @@ def encode_ccsds_packet(data: dict, apid: int, seq_count: int) -> bytes:
 
     return the finished bytes
     """
-    
-payload_temp = encode_ccsds_cdh_payload(cdh.get_cdh_telemetry())
-print(payload_temp)
-def decode_ccsds_cdh_payload(payload: bytes) -> dict:
-    fields = struct.unpack(">fffBBfIHBB", payload)
-    return {
-        "processor_temp": fields[0],
-        "processor_freq": fields[1],
-        "processor_util": fields[2],
-        "ram_usage": fields[3],
-        "disk_usage": fields[4],
-        "cooling_fan_speed": fields[5],
-        "uptime": fields[6],
-        "watchdog_counter": fields[7],
-        "software_version": fields[8],
-        "event_flags": fields[9],
-    }
-decoded = decode_ccsds_cdh_payload(payload_temp)
-print(decoded)
+    pass
