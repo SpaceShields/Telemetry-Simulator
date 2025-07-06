@@ -1,44 +1,144 @@
 import struct
-from datetime import datetime, timedelta
+from src.ccsds import time, crc, apid
+from src.subsystems import cdh, comms, power, propulsion, thermal, adcs, payload
+import sys
+sys.path.append("src")
 
-# # Assume simulation starts at a known datetime (TLI event time, etc.)
-# mission_start = datetime(2025, 6, 21, 0, 0, 0)
+"""
+Purpose of this file: This file contains the implementation of the CCSDS encoder.
+It provides functions to encode CCSDS packets, including adding APID, CUC time, and CRC.
+The encoder ensures that the packets conform to the CCSDS standards for data transfer.
+CCSDS 133.0-B (telemetry source packets)
+"""
 
-def encode_primary_header(apid: int, seq_count: int, payload_length: int) -> bytes:
-    version = 0         # 3 bits
-    pkt_type = 0        # 1 bit (0 = telemetry)
-    sec_hdr_flag = 1    # 1 bit (1 = present)
+# define the struct format
+# >: big-endian
+# f: float (4 bytes)
+# f: float
+# f: float
+# B: uint8
+# B: uint8
+# f: float
+# I: uint32
+# H: uint16
+# B: uint8
+# B: uint8
+CDH_STRUCT_FORMAT = ">fffBBfIHBB"
 
-    first_2_bytes = ((version & 0x07) << 13) | \
-                    ((pkt_type & 0x01) << 12) | \
-                    ((sec_hdr_flag & 0x01) << 11) | \
-                    (apid & 0x07FF)
+def encode_ccsds_cdh_payload(data: dict) -> bytes:
+    """
+    Encodes CDH telemetry data into a CCSDS-compliant payload.
     
-    second_2_bytes = (0b11 << 14) | (seq_count & 0x3FFF)    # Seq flag + count
+    The struct format is:
+        processor_temp      -> float
+        processor_freq      -> float
+        processor_util      -> float
+        ram_usage           -> uint8
+        disk_usage          -> uint8
+        cooling_fan_speed   -> float
+        uptime              -> uint32
+        watchdog_counter    -> uint16
+        software_version    -> uint8
+        event_flags         -> uint8 bitfield
+    """
 
-    third_2_bytes = payload_length - 1  # CCSDS rule: "length = payload - 1"
-
-    return struct.pack('>HHH', first_2_bytes, second_2_bytes, third_2_bytes)
-
-def encode_secondary_header() -> bytes:
-    timestamp = int(datetime.now().timestamp())
-    return struct.pack('>I', timestamp)
-
-def encode_payload(data: dict) -> bytes:
-    return struct.pack(
-        ">ffffffI",
-        data["cpu_temp"],
-        data["cpu_freq"],
-        data["cpu_usage"],
-        data["ram"],
-        data["disk_usage"],
-        data["fan_speed"],
-        data["uptime"]
+    # validate/normalize inputs
+    processor_temp = float(data['processor_temp'])
+    processor_freq = float(data['processor_freq'])
+    processor_util = float(data['processor_util'])
+    ram_usage = int(data['ram_usage'])
+    disk_usage = int(data['disk_usage'])
+    cooling_fan_speed = float(data['cooling_fan_speed'])
+    uptime = int(data['uptime'])
+    watchdog_counter = int(data['watchdog_counter'])
+    software_version = int(data['software_version'])
+    event_flags = int(data['event_flags'])  # bitfield, 0–255
+    
+    # pack it all in one shot
+    payload = struct.pack(
+        CDH_STRUCT_FORMAT,
+        processor_temp,
+        processor_freq,
+        processor_util,
+        ram_usage,
+        disk_usage,
+        cooling_fan_speed,
+        uptime,
+        watchdog_counter,
+        software_version,
+        event_flags
     )
+    
+    return payload
+
+def encode_ccsds_primary_header() -> bytes:
+    """
+    Fields:
+        version (3 bits)
+
+        type (1 bit, telemetry = 0)
+
+        secondary header flag (1 bit)
+
+        APID (11 bits)
+
+        sequence flags (2 bits)
+
+        sequence count (14 bits)
+
+        data length (TBD, payload+secondary header minus 1)
+    """
+    pass
+
+def encode_ccsds_secondary_header() -> bytes:
+    """
+    use encode_cuc_time() from time.py
+
+    4 bytes
+
+    integrate directly without hardcoding
+    """
+    pass
+
+
+def crc_generator() -> bytes:
+    """
+    reuse append_crc() from crc.py
+
+    append to the entire packet
+    """
+    pass
 
 def encode_ccsds_packet(data: dict, apid: int, seq_count: int) -> bytes:
-    payload = encode_payload(data)
-    sec_header = encode_secondary_header()
-    packet_length = len(sec_header) + len(payload)
-    primary = encode_primary_header(apid, seq_count, packet_length)
-    return primary + sec_header + payload
+    """
+    build payload
+
+    build secondary header
+
+    build primary header
+
+    concatenate
+
+    append CRC
+
+    return the finished bytes
+    """
+    
+payload_temp = encode_ccsds_cdh_payload(cdh.get_cdh_telemetry())
+print(payload_temp)
+def decode_ccsds_cdh_payload(payload: bytes) -> dict:
+    fields = struct.unpack(">fffBBfIHBB", payload)
+    return {
+        "processor_temp": fields[0],
+        "processor_freq": fields[1],
+        "processor_util": fields[2],
+        "ram_usage": fields[3],
+        "disk_usage": fields[4],
+        "cooling_fan_speed": fields[5],
+        "uptime": fields[6],
+        "watchdog_counter": fields[7],
+        "software_version": fields[8],
+        "event_flags": fields[9],
+    }
+decoded = decode_ccsds_cdh_payload(payload_temp)
+print(decoded)

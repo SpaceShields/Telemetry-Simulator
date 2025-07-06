@@ -1,6 +1,6 @@
 import socket
 import time
-from subsystems.cdh import read_pi_data
+from subsystems.cdh import get_cdh_telemetry
 from src.ccsds import encode_ccsds_packet
 from dotenv import load_dotenv
 import os
@@ -17,7 +17,7 @@ def transmit_packets(apid=100, interval=1.0, ip=GROUND_IP, port=GROUND_PORT):
     try:
 
         while True:
-            data = read_pi_data()
+            data = get_cdh_telemetry()
             packet = encode_ccsds_packet(data, apid, seq_count)
             sock.sendto(packet, (ip, port))
             hex_display = ":".join(f"{byte:02X}" for byte in packet)

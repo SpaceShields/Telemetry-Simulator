@@ -1,27 +1,50 @@
 import psutil
 import time
-import os
 
-def read_pi_data():
-    cpu_temp = psutil.sensors_temperatures()['cpu_thermal'][0].current  # or custom
-    cpu_freq = psutil.cpu_freq().current
-    cpu_usage = psutil.cpu_percent()
+def get_cdh_telemetry():
+    """
+    Return a dictionary of CDH subsystem telemetry values
+    """
+
+    # Read data from the Pi5
+    
+    # Defensive, fallback-protected metrics
+    temps = psutil.sensors_temperatures()
+    if temps and 'cpu_thermal' in temps and temps['cpu_thermal']:
+        temp = temps['cpu_thermal'][0].current
+    else:
+        temp = 45.0  # reasonable fallback
+
+    freq = psutil.cpu_freq().current
+    util = psutil.cpu_percent()
     ram = psutil.virtual_memory().percent
     disk_usage = psutil.disk_usage('/').percent
     fans = psutil.sensors_fans()
-    fan_speed = next(iter(fans.values()))[0].current if fans else 0.0 
+    try:
+        fan_speed = next(iter(fans.values()))[0].current if fans else 0.0 
+    except (StopIteration, IndexError):
+        fan_speed = 0.0
     uptime = int(time.time() - psutil.boot_time())
 
-    cpu_temp = round(cpu_temp, 2)
-    cpu_freq = round(cpu_freq, 1)
-    cpu_usage = round(cpu_usage, 1)
+    # Simulated data
+    watchdog_counter = 0  # Placeholder for watchdog counter
+    software_version = 1  # Placeholder for software version
+    event_flags = 0b00000000  # Placeholder for event flags
+
+    # Round values to appropriate precision
+    temp = round(temp, 2)
+    freq = round(freq, 1)
+    util = round(util, 1)
 
     return {
-        "cpu_temp": cpu_temp,
-        "cpu_freq": cpu_freq,
-        "cpu_usage": cpu_usage,
-        "ram": ram,
+        "processor_temp": temp,
+        "processor_freq": freq,
+        "processor_util": util,
+        "ram_usage": ram,
         "disk_usage": disk_usage,
-        "fan_speed": fan_speed,
-        "uptime": uptime
+        "cooling_fan_speed": fan_speed,
+        "uptime": uptime,
+        "watchdog_counter": watchdog_counter,
+        "software_version": software_version,
+        "event_flags": event_flags
     }
