@@ -1,15 +1,11 @@
+import eventlet
+eventlet.monkey_patch()
 from flask import Flask, render_template
 from flask_socketio import SocketIO, emit
 import socket
 from threading import Thread
-import sys
-import os
-import eventlet
-eventlet.monkey_patch()
 
-
-sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
-from src.packet_decoder import decode_ccsds_packet, print_decoded_packet
+from src.ccsds.decoder import decode_ccsds_packet, print_decoded_packet
 
 app = Flask(__name__)
 socketio = SocketIO(app)

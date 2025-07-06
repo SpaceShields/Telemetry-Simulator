@@ -1,7 +1,7 @@
 import socket
 import time
-from src.pi_reader import read_pi_data
-from src.packet_encoder import encode_ccsds_packet
+from subsystems.cdh import read_pi_data
+from src.ccsds import encode_ccsds_packet
 from dotenv import load_dotenv
 import os
 
