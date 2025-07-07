@@ -1,7 +1,5 @@
 import struct
 from src.ccsds import time, crc, apid
-from src.subsystems import cdh, comms, power, propulsion, thermal, adcs, payload
-
 
 """
 Purpose of this file: This file contains the implementation of the CCSDS encoder.
@@ -13,9 +11,9 @@ CCSDS 133.0-B (telemetry source packets)
 # define the struct format
 # >: big-endian
 # f: float (4 bytes)
-# I: uint32
-# H: uint16
-# B: uint8
+# I: uint32 (4 bytes)
+# H: uint16 (2 bytes)
+# B: uint8 (1 byte)
 CDH_STRUCT_FORMAT = ">fffBBfIHBB"
 POWER_STRUCT_FORMAT = ">ffffffffBB"
 COMMS_STRUCT_FORMAT = ">fffffI4B"
@@ -23,6 +21,12 @@ THERMAL_STRUCT_FORMAT = ">fBBBBffB"
 ADCS_STRUCT_FORMAT = ">ffffffffff4B"
 PROPULSION_STRUCT_FORMAT = ">ffff4BffBB"
 PAYLOAD_STRUCT_FORMAT = ">BBHBffBB"
+
+# Header constants
+CCSDS_VERSION = 0
+CCSDS_PKT_TYPE = 0
+CCSDS_SEC_HDR_FLAG = 1
+CCSDS_SEQ_FLAGS = 0b11
 
 def encode_ccsds_cdh_payload(data: dict) -> bytes:
     """
@@ -350,9 +354,7 @@ def encode_ccsds_payload_payload(data: dict) -> bytes:
     
     return payload
 
-
-# Placeholders
-def encode_ccsds_primary_header() -> bytes:
+def encode_ccsds_primary_header(apid: int, seq_count: int, total_data_length: int) -> bytes:
     """
     Fields:
         version (3 bits)
@@ -369,7 +371,27 @@ def encode_ccsds_primary_header() -> bytes:
 
         data length (TBD, payload+secondary header minus 1)
     """
-    pass
+
+    first_two_bytes = (
+        (CCSDS_VERSION & 0b111) |  # version (3 bits)
+        (CCSDS_PKT_TYPE & 0b1) |  # type (1 bit)
+        (CCSDS_SEC_HDR_FLAG & 0b1) |  # secondary header flag (1 bit)
+        (apid & 0x7FF)  # APID (11 bits)
+    )
+
+    second_two_bytes = (
+        (CCSDS_SEQ_FLAGS & 0b11) << 14 |  # sequence flags (2 bits)
+        (seq_count & 0x3FFF)  # sequence count (14 bits)
+    )
+
+    third_two_bytes = total_data_length
+
+    return struct.pack(
+        ">HHH",
+        first_two_bytes,
+        second_two_bytes,
+        third_two_bytes
+    )
 
 def encode_ccsds_secondary_header() -> bytes:
     """
@@ -379,28 +401,36 @@ def encode_ccsds_secondary_header() -> bytes:
 
     integrate directly without hardcoding
     """
-    pass
+    return time.encode_cuc_time()
 
-def crc_generator() -> bytes:
+def encode_ccsds_packet(subsystem: str, data: dict, seq_count: int) -> bytes:
     """
-    reuse append_crc() from crc.py
-
-    append to the entire packet
+    Encodes a full CCSDS telemetry packet with headers and CRC for a given subsystem.
     """
-    pass
+    # Dispatch table: maps subsystem → (encoder_fn, apid_key)
+    subsystem_map = {
+        'cdh': (encode_ccsds_cdh_payload, 'cdh'),
+        'power': (encode_ccsds_power_payload, 'power'),
+        'comms': (encode_ccsds_comms_payload, 'comms'),
+        'thermal': (encode_ccsds_thermal_payload, 'thermal'),
+        'adcs': (encode_ccsds_adcs_payload, 'adcs'),
+        'propulsion': (encode_ccsds_propulsion_payload, 'propulsion'),
+        'payload': (encode_ccsds_payload_payload, 'payload'),
+    }
 
-def encode_ccsds_packet(data: dict, apid: int, seq_count: int) -> bytes:
-    """
-    build payload
+    if subsystem not in subsystem_map:
+        raise ValueError(f"Unknown subsystem: {subsystem}")
 
-    build secondary header
+    encoder_fn, apid_key = subsystem_map[subsystem]
+    payload = encoder_fn(data)
+    apid_value = apid.get_apid(apid_key)
 
-    build primary header
+    secondary_header = encode_ccsds_secondary_header()
 
-    concatenate
+    # Total data field = secondary header + payload, minus 1 (per CCSDS 133.0-B)
+    total_data_len = len(secondary_header) + len(payload) - 1
+    primary_header = encode_ccsds_primary_header(apid_value, seq_count, total_data_len)
 
-    append CRC
-
-    return the finished bytes
-    """
-    pass
+    # Assemble and finalize
+    packet = primary_header + secondary_header + payload
+    return crc.append_crc(packet)
