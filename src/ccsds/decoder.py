@@ -1,5 +1,145 @@
 import struct
-from datetime import datetime, timezone
+from datetime import datetime
+
+def decode_ccsds_adcs_payload(payload: bytes) -> dict:
+    """
+    Decode the ADCS payload to verify correctness.
+    """
+    fields = struct.unpack(">ffffffffff4B", payload)
+    return {
+        "quat_w": fields[0],
+        "quat_x": fields[1],
+        "quat_y": fields[2],
+        "quat_z": fields[3],
+        "ang_velocity_x": fields[4],
+        "ang_velocity_y": fields[5],
+        "ang_velocity_z": fields[6],
+        "mag_field_x": fields[7],
+        "mag_field_y": fields[8],
+        "mag_field_z": fields[9],
+        "sun_sensor_status": fields[10],
+        "gyro_status": fields[11],
+        "adcs_mode": fields[12],
+        "adcs_fault_flags": fields[13]
+    }
+
+def decode_ccsds_cdh_payload(payload: bytes) -> dict:
+    fields = struct.unpack(">fffBBfIHBB", payload)
+    return {
+        "processor_temp": fields[0],
+        "processor_freq": fields[1],
+        "processor_util": fields[2],
+        "ram_usage": fields[3],
+        "disk_usage": fields[4],
+        "cooling_fan_speed": fields[5],
+        "uptime": fields[6],
+        "watchdog_counter": fields[7],
+        "software_version": fields[8],
+        "event_flags": fields[9],
+    }
+
+def decode_ccsds_comms_payload(payload: bytes) -> dict:
+    """
+    Decode the comms payload to verify correctness.
+    """
+    fields = struct.unpack(">fffffI4B", payload)
+    return {
+        "tx_frequency": fields[0],
+        "rx_frequency": fields[1],
+        "tx_power": fields[2],
+        "rx_signal_strength": fields[3],
+        "bit_error_rate": fields[4],
+        "frame_sync_errors": fields[5],
+        "carrier_lock": fields[6],
+        "modulation_mode": fields[7],
+        "comms_mode": fields[8],
+        "comms_fault_flags": fields[9]
+    }
+
+def decode_ccsds_payload_payload(payload_bytes: bytes) -> dict:
+    """
+    Decode the payload subsystem data for verification.
+    """
+    fields = struct.unpack(">BBHBffBB", payload_bytes)
+    return {
+        "camera_status": fields[0],
+        "spectrometer_status": fields[1],
+        "image_capture_count": fields[2],
+        "last_image_quality": fields[3],
+        "spectrometer_last_wavelength": fields[4],
+        "spectrometer_last_intensity": fields[5],
+        "payload_mode": fields[6],
+        "payload_fault_flags": fields[7]
+    }
+
+def decode_ccsds_power_payload(payload: bytes) -> dict:
+    """
+    Decode the power payload to verify correctness.
+    """
+    fields = struct.unpack(">ffffffffBB", payload)
+    return {
+        "bus_voltage": fields[0],
+        "bus_current": fields[1],
+        "battery_voltage": fields[2],
+        "battery_current": fields[3],
+        "battery_temp": fields[4],
+        "state_of_charge": fields[5],
+        "solar_array_current": fields[6],
+        "solar_array_voltage": fields[7],
+        "eps_mode": fields[8],
+        "fault_flags": fields[9]
+    }
+
+def decode_ccsds_propulsion_payload(payload: bytes) -> dict:
+    """
+    Decode the propulsion payload to verify correctness.
+    """
+    fields = struct.unpack(">ffffBBBBffBB", payload)
+    return {
+        "fuel_level": fields[0],
+        "oxidizer_level": fields[1],
+        "tank_pressure": fields[2],
+        "feedline_temp": fields[3],
+        "valve_status": fields[4],
+        "thruster_firing": fields[5],
+        "thruster_mode": fields[6],
+        "propulsion_fault_flags": fields[7],
+        "rcs_tank_level": fields[8],
+        "rcs_tank_pressure": fields[9],
+        "rcs_thruster_status": fields[10],
+        "rcs_fault_flags": fields[11]
+    }
+
+def decode_ccsds_thermal_payload(payload: bytes) -> dict:
+    """
+    Decode the thermal payload to verify correctness.
+    """
+    fields = struct.unpack(">fBBBBffB", payload)
+    return {
+        "average_temp": fields[0],
+        "heater_status": fields[1],
+        "radiator_status": fields[2],
+        "heat_pipe_status": fields[3],
+        "thermal_mode": fields[4],
+        "hot_spot_temp": fields[5],
+        "cold_spot_temp": fields[6],
+        "thermal_fault_flags": fields[7]
+    }
+
+DECODE_ROUTER = {
+    0x01: decode_ccsds_cdh_payload,
+    0x02: decode_ccsds_power_payload,
+    0x03: decode_ccsds_comms_payload,
+    0x04: decode_ccsds_thermal_payload,
+    0x05: decode_ccsds_adcs_payload,
+    0x06: decode_ccsds_propulsion_payload,
+    0x07: decode_ccsds_payload_payload
+}
+
+def decode_payload(packet: bytes, apid: int) -> dict:
+    if apid not in DECODE_ROUTER:
+        raise ValueError(f"Unsupported APID: {apid}")
+    return DECODE_ROUTER[apid](packet[10:-2])  # skip headers, exclude CRC
 
 def decode_primary_header(packet: bytes) -> dict:
     version_type_apid, seq_flags_count, length = struct.unpack('>HHH', packet[:6])
@@ -29,52 +169,12 @@ def decode_secondary_header(packet: bytes) -> dict:
         "timestamp": datetime.fromtimestamp(timestamp).isoformat()
     }
 
-def decode_payload(packet: bytes) -> dict:
-    payload = struct.unpack('>ffffffI', packet[10:38])
-    return {
-        "cpu_temp": payload[0],
-        "cpu_freq": payload[1],
-        "cpu_usage": payload[2],
-        "ram": payload[3],
-        "disk_usage": payload[4],
-        "fan_speed": payload[5],
-        "uptime": payload[6]
-    }
-
 def decode_ccsds_packet(packet: bytes) -> dict:
     primary = decode_primary_header(packet)
     secondary = decode_secondary_header(packet)
-    payload = decode_payload(packet)
+    payload = decode_payload(packet, primary["apid"])
     return {
         "primary": primary,
         "secondary": secondary,
         "payload": payload
     }
-
-def print_decoded_packet(decoded: dict):
-    print("\n=== [CCSDS PACKET RECEIVED] ===", flush=True)
-
-    print("[PRIMARY HEADER]", flush=True)
-    for k, v in decoded["primary"].items():
-        print(f"  {k:<18}: {v}", flush=True)
-
-    print("\n[SECONDARY HEADER]", flush=True)
-    for k, v in decoded["secondary"].items():
-        print(f"  {k:<15}: {v}", flush=True)
-
-    print("\n[PAYLOAD]", flush=True)
-    payload = decoded["payload"]
-    print(f"  CPU Temp          : {payload['cpu_temp']:.2f} C", flush=True)
-    print(f"  CPU Frequency     : {payload['cpu_freq']:.2f} MHz", flush=True)
-    print(f"  CPU Usage         : {payload['cpu_usage']:.2f} %", flush=True)
-    print(f"  RAM Usage         : {payload['ram']:.2f} %", flush=True)
-    print(f"  Disk Usage        : {payload['disk_usage']:.2f} %", flush=True)
-    print(f"  Fan Speed         : {payload['fan_speed']:.2f} RPM", flush=True)
-    
-    # Convert uptime to HH:MM:SS
-    uptime_sec = payload["uptime"]
-    hrs, rem = divmod(uptime_sec, 3600)
-    mins, secs = divmod(rem, 60)
-    print(f"  Uptime            : {int(hrs):02}:{int(mins):02}:{int(secs):02}", flush=True)
-
-    print("=" * 40, flush=True)

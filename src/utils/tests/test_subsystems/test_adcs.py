@@ -1,28 +1,5 @@
 from src.subsystems import adcs
-from src.ccsds import encoder
-import struct
-
-def decode_ccsds_adcs_payload(payload: bytes) -> dict:
-    """
-    Decode the ADCS payload to verify correctness.
-    """
-    fields = struct.unpack(">ffffffffff4B", payload)
-    return {
-        "quat_w": fields[0],
-        "quat_x": fields[1],
-        "quat_y": fields[2],
-        "quat_z": fields[3],
-        "ang_velocity_x": fields[4],
-        "ang_velocity_y": fields[5],
-        "ang_velocity_z": fields[6],
-        "mag_field_x": fields[7],
-        "mag_field_y": fields[8],
-        "mag_field_z": fields[9],
-        "sun_sensor_status": fields[10],
-        "gyro_status": fields[11],
-        "adcs_mode": fields[12],
-        "adcs_fault_flags": fields[13]
-    }
+from src.ccsds import encoder, decoder
 
 def test_adcs_telemetry_keys():
     """
@@ -54,7 +31,7 @@ def test_adcs_payload_encoding_decoding():
     """
     data = adcs.get_adcs_telemetry()
     payload = encoder.encode_ccsds_adcs_payload(data)
-    decoded = decode_ccsds_adcs_payload(payload)
+    decoded = decoder.decode_ccsds_adcs_payload(payload)
 
     # approximate float checks
     for field in [

@@ -1,22 +1,5 @@
 from src.subsystems import thermal
-from src.ccsds import encoder
-import struct
-
-def decode_ccsds_thermal_payload(payload: bytes) -> dict:
-    """
-    Decode the thermal payload to verify correctness.
-    """
-    fields = struct.unpack(">fBBBBffB", payload)
-    return {
-        "average_temp": fields[0],
-        "heater_status": fields[1],
-        "radiator_status": fields[2],
-        "heat_pipe_status": fields[3],
-        "thermal_mode": fields[4],
-        "hot_spot_temp": fields[5],
-        "cold_spot_temp": fields[6],
-        "thermal_fault_flags": fields[7]
-    }
+from src.ccsds import encoder, decoder
 
 def test_thermal_telemetry_keys():
     """
@@ -42,7 +25,7 @@ def test_thermal_payload_encoding_decoding():
     """
     data = thermal.get_thermal_telemetry()
     payload = encoder.encode_ccsds_thermal_payload(data)
-    decoded = decode_ccsds_thermal_payload(payload)
+    decoded = decoder.decode_ccsds_thermal_payload(payload)
 
     # approximate float checks
     for field in [

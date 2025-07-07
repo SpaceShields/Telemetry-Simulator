@@ -1,24 +1,7 @@
 from src.subsystems import comms
-from src.ccsds import encoder
-import struct
+from src.ccsds import encoder, decoder
 
-def decode_ccsds_comms_payload(payload: bytes) -> dict:
-    """
-    Decode the comms payload to verify correctness.
-    """
-    fields = struct.unpack(">fffffI4B", payload)
-    return {
-        "tx_frequency": fields[0],
-        "rx_frequency": fields[1],
-        "tx_power": fields[2],
-        "rx_signal_strength": fields[3],
-        "bit_error_rate": fields[4],
-        "frame_sync_errors": fields[5],
-        "carrier_lock": fields[6],
-        "modulation_mode": fields[7],
-        "comms_mode": fields[8],
-        "comms_fault_flags": fields[9]
-    }
+
 
 def test_comms_telemetry_keys():
     """
@@ -46,7 +29,7 @@ def test_comms_payload_encoding_decoding():
     """
     data = comms.get_comms_telemetry()
     payload = encoder.encode_ccsds_comms_payload(data)
-    decoded = decode_ccsds_comms_payload(payload)
+    decoded = decoder.decode_ccsds_comms_payload(payload)
 
     # approximate float checks
     for field in [

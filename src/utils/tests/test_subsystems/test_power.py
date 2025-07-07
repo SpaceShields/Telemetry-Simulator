@@ -1,25 +1,5 @@
-import pytest
 from src.subsystems import power
-from src.ccsds import encoder
-import struct
-
-def decode_ccsds_power_payload(payload: bytes) -> dict:
-    """
-    Decode the power payload to verify correctness.
-    """
-    fields = struct.unpack(">ffffffffBB", payload)
-    return {
-        "bus_voltage": fields[0],
-        "bus_current": fields[1],
-        "battery_voltage": fields[2],
-        "battery_current": fields[3],
-        "battery_temp": fields[4],
-        "state_of_charge": fields[5],
-        "solar_array_current": fields[6],
-        "solar_array_voltage": fields[7],
-        "eps_mode": fields[8],
-        "fault_flags": fields[9]
-    }
+from src.ccsds import encoder, decoder
 
 def test_power_telemetry_keys():
     """
@@ -47,7 +27,7 @@ def test_power_payload_encoding_decoding():
     """
     data = power.get_power_telemetry()
     payload = encoder.encode_ccsds_power_payload(data)
-    decoded = decode_ccsds_power_payload(payload)
+    decoded = decoder.decode_ccsds_power_payload(payload)
 
     # approximate float checks
     for field in [

@@ -17,8 +17,8 @@ def get_cdh_telemetry():
 
     freq = psutil.cpu_freq().current
     util = psutil.cpu_percent()
-    ram = psutil.virtual_memory().percent
-    disk_usage = psutil.disk_usage('/').percent
+    ram = int(psutil.virtual_memory().percent)
+    disk_usage = int(psutil.disk_usage('/').percent)
     fans = psutil.sensors_fans()
     try:
         fan_speed = next(iter(fans.values()))[0].current if fans else 0.0 

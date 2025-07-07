@@ -1,22 +1,5 @@
 from src.subsystems import payload
-from src.ccsds import encoder
-import struct
-
-def decode_ccsds_payload_payload(payload_bytes: bytes) -> dict:
-    """
-    Decode the payload subsystem data for verification.
-    """
-    fields = struct.unpack(">BBHBffBB", payload_bytes)
-    return {
-        "camera_status": fields[0],
-        "spectrometer_status": fields[1],
-        "image_capture_count": fields[2],
-        "last_image_quality": fields[3],
-        "spectrometer_last_wavelength": fields[4],
-        "spectrometer_last_intensity": fields[5],
-        "payload_mode": fields[6],
-        "payload_fault_flags": fields[7]
-    }
+from src.ccsds import encoder, decoder
 
 def test_payload_telemetry_keys():
     """
@@ -42,7 +25,7 @@ def test_payload_payload_encoding_decoding():
     """
     data = payload.get_payload_telemetry()
     encoded = encoder.encode_ccsds_payload_payload(data)
-    decoded = decode_ccsds_payload_payload(encoded)
+    decoded = decoder.decode_ccsds_payload_payload(encoded)
 
     # approximate float checks
     for field in [

@@ -10,7 +10,12 @@ def receive_packets():
             data, addr = sock.recvfrom(1024)
             hex_display = ":".join(f"{byte:02X}" for byte in data)
             print(f"[RX] Received {len(data)} bytes from {addr} -> {hex_display}", flush=True)
-            print_decoded_packet(decode_ccsds_packet(data))
+            print("[RX] Decoding packet...", flush=True)
+            print("==========================", flush=True)
+            decoded_data = decode_ccsds_packet(data)
+            print(decoded_data, flush=True)
+            print("[RX] Decoded packet successfully.", flush=True)
+            print("===========================", flush=True)
     except KeyboardInterrupt:
         print("\n[RX] Shutdown requested. Closing socket...", flush=True)
     finally:
