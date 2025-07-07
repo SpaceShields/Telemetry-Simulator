@@ -16,8 +16,8 @@ def receive_packets():
             print("==========================", flush=True)
             try:
                 decoded = decode_ccsds_packet(data)
-                pprint.pprint(decoded, sort_dicts=False)
-                print(f"[RX] Decoded packet successfully with payload length {len(data)}.", flush=True)
+                if decoded:
+                    print(f"[RX] Decoded packet successfully with payload length {len(data)}.", flush=True)
             except (ValueError, struct.error) as e:
                 print(f"[RX] Error decoding packet: {e}", flush=True)
                 print("===========================", flush=True)

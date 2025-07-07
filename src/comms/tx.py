@@ -61,7 +61,7 @@ def transmit_packets(ip=GROUND_IP, port=GROUND_PORT):
             time.sleep(0.01)  # Prevent busy-waiting
             
     except KeyboardInterrupt:
-        print("\n[RX] Shutdown requested. Closing socket...", flush=True)
+        print("\n[TX] Shutdown requested. Closing socket...", flush=True)
     finally:
         sock.close()
-        print("[RX] Socket closed.", flush=True)
+        print("[TX] Socket closed.", flush=True)

@@ -374,10 +374,10 @@ def encode_ccsds_primary_header(apid: int, seq_count: int, total_data_length: in
     """
 
     first_two_bytes = (
-        (CCSDS_VERSION & 0b111) |  # version (3 bits)
-        (CCSDS_PKT_TYPE & 0b1) |  # type (1 bit)
-        (CCSDS_SEC_HDR_FLAG & 0b1) |  # secondary header flag (1 bit)
-        (apid & 0x7FF)  # APID (11 bits)
+        (CCSDS_VERSION << 13) |  # version (3 bits)
+        (CCSDS_PKT_TYPE << 12) |  # type (1 bit)
+        (CCSDS_SEC_HDR_FLAG << 11) |  # secondary header flag (1 bit)
+        apid  # APID (11 bits)
     )
 
     second_two_bytes = (
@@ -435,7 +435,5 @@ def encode_ccsds_packet(subsystem: str, data: dict, seq_count: int) -> bytes:
 
     # Assemble and finalize
     packet = primary_header + secondary_header + payload
-
-    print(f"[DEBUG] POWER payload encoded: {len(payload)} bytes")
 
     return crc.append_crc(packet)
