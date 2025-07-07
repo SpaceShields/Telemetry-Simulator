@@ -435,4 +435,7 @@ def encode_ccsds_packet(subsystem: str, data: dict, seq_count: int) -> bytes:
 
     # Assemble and finalize
     packet = primary_header + secondary_header + payload
+
+    print(f"[DEBUG] POWER payload encoded: {len(payload)} bytes")
+
     return crc.append_crc(packet)
