@@ -27,6 +27,7 @@ POWER_STRUCT_FORMAT = ">ffffffffBB"
 COMMS_STRUCT_FORMAT = ">fffffI4B"
 THERMAL_STRUCT_FORMAT = ">fBBBBffB"
 ADCS_STRUCT_FORMAT = ">ffffffffff4B"
+PROPULSION_STRUCT_FORMAT = ">ffff4BffBB"
 
 def encode_ccsds_cdh_payload(data: dict) -> bytes:
     """
@@ -260,6 +261,58 @@ def encode_ccsds_adcs_payload(data: dict) -> bytes:
         gyro_status,
         adcs_mode,
         adcs_fault_flags
+    )
+    
+    return payload
+
+def encode_ccsds_propulsion_payload(data: dict) -> bytes:
+    """
+    Encodes Propulsion telemetry data into a CCSDS-compliant payload.
+    
+    The struct format is:
+        fuel_level          -> float
+        oxidizer_level      -> float
+        tank_pressure       -> float
+        feedline_temp       -> float
+        valve_status        -> uint8
+        thruster_firing     -> uint8
+        thruster_mode       -> uint8
+        propulsion_fault_flags -> uint8
+        rcs_tank_level      -> float
+        rcs_tank_pressure   -> float
+        rcs_thruster_status -> uint8
+        rcs_fault_flags     -> uint8
+    """
+    
+    # validate/normalize inputs
+    fuel_level = float(data['fuel_level'])
+    oxidizer_level = float(data['oxidizer_level'])
+    tank_pressure = float(data['tank_pressure'])
+    feedline_temp = float(data['feedline_temp'])
+    valve_status = int(data['valve_status'])  # 0 or 1
+    thruster_firing = int(data['thruster_firing'])  # 0 or 1
+    thruster_mode = int(data['thruster_mode'])  # 0–2
+    propulsion_fault_flags = int(data['propulsion_fault_flags'])  # bitfield, 0–255
+    rcs_tank_level = float(data['rcs_tank_level'])
+    rcs_tank_pressure = float(data['rcs_tank_pressure'])
+    rcs_thruster_status = int(data['rcs_thruster_status'])  # 0 or 1
+    rcs_fault_flags = int(data['rcs_fault_flags'])  # bitfield, 0–255
+    
+    # pack it all in one shot
+    payload = struct.pack(
+        PROPULSION_STRUCT_FORMAT,
+        fuel_level,
+        oxidizer_level,
+        tank_pressure,
+        feedline_temp,
+        valve_status,
+        thruster_firing,
+        thruster_mode,
+        propulsion_fault_flags,
+        rcs_tank_level,
+        rcs_tank_pressure,
+        rcs_thruster_status,
+        rcs_fault_flags
     )
     
     return payload
