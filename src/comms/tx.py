@@ -54,8 +54,7 @@ def transmit_packets(ip=GROUND_IP, port=GROUND_PORT):
                     data = GET_TELEMETRY_FUNC[subsystem]() # Get telemetry data for the subsystem
                     packet = encode_ccsds_packet(subsystem, data, seq_count[subsystem]) # Encode the packet
                     sock.sendto(packet, (ip, port)) # Send the packet to the ground station
-                    hex_display = ":".join(f"{byte:02X}" for byte in packet) # Format packet as hex string
-                    print(f"[TX] {subsystem.upper()} Packet #{seq_count[subsystem]} → {hex_display}") # Print the packet details
+                    print(f"[TX] Sent to {ip} -> {subsystem.upper()} Packet #{seq_count[subsystem]}") # Print the packet details
                     seq_count[subsystem] = (seq_count[subsystem] + 1) % 16384 # Increment sequence count, wrap around at 16384
                     last_emit[subsystem] = now # Update the last emit time for this subsystem
             time.sleep(0.01)  # Prevent busy-waiting
