@@ -22,11 +22,11 @@ class ApidError(Exception):
 # This serves as the single source of truth for APIDs across the system
 apid_dict = {
     "cdh": CDH,
-    "comms": COMMS,
     "power": POWER,
-    "propulsion": PROPULSION,
+    "comms": COMMS,
     "thermal": THERMAL,
     "adcs": ADCS,
+    "propulsion": PROPULSION,
     "payload": PAYLOAD,
 }
 
