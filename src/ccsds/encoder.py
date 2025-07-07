@@ -13,14 +13,8 @@ CCSDS 133.0-B (telemetry source packets)
 # define the struct format
 # >: big-endian
 # f: float (4 bytes)
-# f: float
-# f: float
-# B: uint8
-# B: uint8
-# f: float
 # I: uint32
 # H: uint16
-# B: uint8
 # B: uint8
 CDH_STRUCT_FORMAT = ">fffBBfIHBB"
 POWER_STRUCT_FORMAT = ">ffffffffBB"
@@ -28,6 +22,7 @@ COMMS_STRUCT_FORMAT = ">fffffI4B"
 THERMAL_STRUCT_FORMAT = ">fBBBBffB"
 ADCS_STRUCT_FORMAT = ">ffffffffff4B"
 PROPULSION_STRUCT_FORMAT = ">ffff4BffBB"
+PAYLOAD_STRUCT_FORMAT = ">BBHBffBB"
 
 def encode_ccsds_cdh_payload(data: dict) -> bytes:
     """
@@ -316,6 +311,45 @@ def encode_ccsds_propulsion_payload(data: dict) -> bytes:
     )
     
     return payload
+
+def encode_ccsds_payload_payload(data: dict) -> bytes:
+    """
+    Encodes the telemetry data for the spacecraft surveying and spectrometer payload into a CCSDS-compliant payload based on the subsystem type.
+
+    The struct format is:
+        camera_status          -> uint8
+        spectrometer_status    -> uint8
+        image_capture_count    -> uint16
+        last_image_quality     -> uint8
+        spectrometer_last_wavelength -> float
+        spectrometer_last_intensity -> float
+        payload_mode           -> uint8
+        payload_fault_flags    -> uint8
+    """
+    camera_status = int(data['camera_status'])  # 0 or 1
+    spectrometer_status = int(data['spectrometer_status'])  # 0 or 1
+    image_capture_count = int(data['image_capture_count'])  # 0–65535
+    last_image_quality = int(data['last_image_quality'])  # 0.0–100.0
+    spectrometer_last_wavelength = float(data['spectrometer_last_wavelength'])  # in nm
+    spectrometer_last_intensity = float(data['spectrometer_last_intensity'])  # in arbitrary units
+    payload_mode = int(data['payload_mode'])  # 0–3
+    payload_fault_flags = int(data['payload_fault_flags'])  # bitfield, 0
+
+    # pack it all in one shot
+    payload = struct.pack(
+        PAYLOAD_STRUCT_FORMAT,
+        camera_status,
+        spectrometer_status,
+        image_capture_count,
+        last_image_quality,
+        spectrometer_last_wavelength,
+        spectrometer_last_intensity,
+        payload_mode,
+        payload_fault_flags
+        )
+    
+    return payload
+
 
 # Placeholders
 def encode_ccsds_primary_header() -> bytes:
