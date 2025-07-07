@@ -5,11 +5,11 @@
 # APIDs for various subsystems
 # These values are defined by the CCSDS standards and may vary by mission or implementation.
 CDH = 0x01
-COMMS = 0x02
-POWER = 0x03
-PROPULSION = 0x04
-THERMAL = 0x05
-ADCS = 0x06
+POWER = 0x02
+COMMS = 0x03
+THERMAL = 0x04
+ADCS = 0x05
+PROPULSION = 0x06
 PAYLOAD = 0x07
 
 # Custom exception for APID handling

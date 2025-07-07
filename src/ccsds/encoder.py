@@ -28,6 +28,7 @@ CCSDS_PKT_TYPE = 0
 CCSDS_SEC_HDR_FLAG = 1
 CCSDS_SEQ_FLAGS = 0b11
 
+
 def encode_ccsds_cdh_payload(data: dict) -> bytes:
     """
     Encodes CDH telemetry data into a CCSDS-compliant payload.
@@ -403,20 +404,21 @@ def encode_ccsds_secondary_header() -> bytes:
     """
     return time.encode_cuc_time()
 
+# Dispatch table: maps subsystem → (encoder_fn, apid_key)
+subsystem_map = {
+    'cdh': (encode_ccsds_cdh_payload, 'cdh'),
+    'power': (encode_ccsds_power_payload, 'power'),
+    'comms': (encode_ccsds_comms_payload, 'comms'),
+    'thermal': (encode_ccsds_thermal_payload, 'thermal'),
+    'adcs': (encode_ccsds_adcs_payload, 'adcs'),
+    'propulsion': (encode_ccsds_propulsion_payload, 'propulsion'),
+    'payload': (encode_ccsds_payload_payload, 'payload'),
+}
+
 def encode_ccsds_packet(subsystem: str, data: dict, seq_count: int) -> bytes:
     """
     Encodes a full CCSDS telemetry packet with headers and CRC for a given subsystem.
     """
-    # Dispatch table: maps subsystem → (encoder_fn, apid_key)
-    subsystem_map = {
-        'cdh': (encode_ccsds_cdh_payload, 'cdh'),
-        'power': (encode_ccsds_power_payload, 'power'),
-        'comms': (encode_ccsds_comms_payload, 'comms'),
-        'thermal': (encode_ccsds_thermal_payload, 'thermal'),
-        'adcs': (encode_ccsds_adcs_payload, 'adcs'),
-        'propulsion': (encode_ccsds_propulsion_payload, 'propulsion'),
-        'payload': (encode_ccsds_payload_payload, 'payload'),
-    }
 
     if subsystem not in subsystem_map:
         raise ValueError(f"Unknown subsystem: {subsystem}")
