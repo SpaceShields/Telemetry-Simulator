@@ -21,9 +21,10 @@ def get_comms_telemetry():
     frame_sync_errors = random.randint(0, 65535) # count of sync errors
     carrier_lock = random.choice([0, 1]) # boolean
     # Mod types 0-3 (0 = FSK, 1 = BPSK, 2 = QPSK, 3 = 16-QAM)
-    modulation_mode = random.choice([0, 1, 2, 3]) # modulation type
+    # Will stay as BPSK for now, but can be extended later
+    modulation_mode = 1 # modulation type
     # Comm modes 0-4 (0 = idle, 1 = normal, 2 = safe, 3 = emergency, 4 = recovery)
-    comms_mode = random.choice([0, 1, 2, 3, 4]) # comms mode
+    comms_mode = 1 # normal mode
     comms_fault_flags = random.randint(0, 255) # bitfield for faults
 
     return {
