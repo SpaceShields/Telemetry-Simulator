@@ -1,11 +1,25 @@
 import struct
 from datetime import datetime
 
+# define the struct format
+# >: big-endian
+# f: float (4 bytes)
+# I: uint32 (4 bytes)
+# H: uint16 (2 bytes)
+# B: uint8 (1 byte)
+CDH_STRUCT_FORMAT = ">fffBBfIHBB"
+POWER_STRUCT_FORMAT = ">ffffffffBB"
+COMMS_STRUCT_FORMAT = ">fffffI4B"
+THERMAL_STRUCT_FORMAT = ">fBBBBffB"
+ADCS_STRUCT_FORMAT = ">ffffffffff4B"
+PROPULSION_STRUCT_FORMAT = ">ffff4BffBB"
+PAYLOAD_STRUCT_FORMAT = ">BBHBffBB"
+
 def decode_ccsds_adcs_payload(payload: bytes) -> dict:
     """
     Decode the ADCS payload to verify correctness.
     """
-    fields = struct.unpack(">ffffffffff4B", payload)
+    fields = struct.unpack(ADCS_STRUCT_FORMAT, payload)
     return {
         "quat_w": fields[0],
         "quat_x": fields[1],
@@ -24,7 +38,7 @@ def decode_ccsds_adcs_payload(payload: bytes) -> dict:
     }
 
 def decode_ccsds_cdh_payload(payload: bytes) -> dict:
-    fields = struct.unpack(">fffBBfIHBB", payload)
+    fields = struct.unpack(CDH_STRUCT_FORMAT, payload)
     return {
         "processor_temp": fields[0],
         "processor_freq": fields[1],
@@ -42,7 +56,7 @@ def decode_ccsds_comms_payload(payload: bytes) -> dict:
     """
     Decode the comms payload to verify correctness.
     """
-    fields = struct.unpack(">fffffI4B", payload)
+    fields = struct.unpack(COMMS_STRUCT_FORMAT, payload)
     return {
         "tx_frequency": fields[0],
         "rx_frequency": fields[1],
@@ -60,7 +74,7 @@ def decode_ccsds_payload_payload(payload_bytes: bytes) -> dict:
     """
     Decode the payload subsystem data for verification.
     """
-    fields = struct.unpack(">BBHBffBB", payload_bytes)
+    fields = struct.unpack(PAYLOAD_STRUCT_FORMAT, payload_bytes)
     return {
         "camera_status": fields[0],
         "spectrometer_status": fields[1],
@@ -76,7 +90,7 @@ def decode_ccsds_power_payload(payload: bytes) -> dict:
     """
     Decode the power payload to verify correctness.
     """
-    fields = struct.unpack(">ffffffffBB", payload)
+    fields = struct.unpack(POWER_STRUCT_FORMAT, payload)
     return {
         "bus_voltage": fields[0],
         "bus_current": fields[1],
@@ -94,7 +108,7 @@ def decode_ccsds_propulsion_payload(payload: bytes) -> dict:
     """
     Decode the propulsion payload to verify correctness.
     """
-    fields = struct.unpack(">ffffBBBBffBB", payload)
+    fields = struct.unpack(PROPULSION_STRUCT_FORMAT, payload)
     return {
         "fuel_level": fields[0],
         "oxidizer_level": fields[1],
@@ -114,7 +128,7 @@ def decode_ccsds_thermal_payload(payload: bytes) -> dict:
     """
     Decode the thermal payload to verify correctness.
     """
-    fields = struct.unpack(">fBBBBffB", payload)
+    fields = struct.unpack(THERMAL_STRUCT_FORMAT, payload)
     return {
         "average_temp": fields[0],
         "heater_status": fields[1],
