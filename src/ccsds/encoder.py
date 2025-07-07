@@ -24,6 +24,7 @@ CCSDS 133.0-B (telemetry source packets)
 # B: uint8
 CDH_STRUCT_FORMAT = ">fffBBfIHBB"
 POWER_STRUCT_FORMAT = ">ffffffffBB"
+COMMS_STRUCT_FORMAT = ">fffffI4B"
 
 def encode_ccsds_cdh_payload(data: dict) -> bytes:
     """
@@ -113,6 +114,52 @@ def encode_ccsds_power_payload(data: dict) -> bytes:
         solar_array_voltage,
         eps_mode,
         fault_flags
+    )
+    
+    return payload
+
+def encode_ccsds_comms_payload(data: dict) -> bytes:
+    """
+    Encodes Communications telemetry data into a CCSDS-compliant payload.
+    
+    The struct format is:
+        tx_frequency        -> float
+        rx_frequency        -> float
+        tx_power            -> float
+        rx_signal_strength  -> float
+        bit_error_rate      -> float
+        frame_sync_errors   -> uint32
+        carrier_lock        -> uint8
+        modulation_mode     -> uint8
+        comms_mode          -> uint8
+        comms_fault_flags   -> uint8
+    """
+    
+    # validate/normalize inputs
+    tx_frequency = float(data['tx_frequency'])
+    rx_frequency = float(data['rx_frequency'])
+    tx_power = float(data['tx_power'])
+    rx_signal_strength = float(data['rx_signal_strength'])
+    bit_error_rate = float(data['bit_error_rate'])
+    frame_sync_errors = int(data['frame_sync_errors'])
+    carrier_lock = int(data['carrier_lock'])  # 0 or 1
+    modulation_mode = int(data['modulation_mode'])  # 0–3
+    comms_mode = int(data['comms_mode'])  # 0–4
+    comms_fault_flags = int(data['comms_fault_flags'])  # bitfield, 0–255
+    
+    # pack it all in one shot
+    payload = struct.pack(
+        COMMS_STRUCT_FORMAT,
+        tx_frequency,
+        rx_frequency,
+        tx_power,
+        rx_signal_strength,
+        bit_error_rate,
+        frame_sync_errors,
+        carrier_lock,
+        modulation_mode,
+        comms_mode,
+        comms_fault_flags
     )
     
     return payload
