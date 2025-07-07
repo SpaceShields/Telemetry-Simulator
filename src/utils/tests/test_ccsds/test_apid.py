@@ -17,11 +17,11 @@ def test_get_subsystem_invalid():
 # It raises an AssertionError if the expected APID does not match the actual APID returned by the function
 def test_get_apid():
     assert apid.get_apid("cdh") == 0x01
-    assert apid.get_apid("comms") == 0x02
-    assert apid.get_apid("power") == 0x03
-    assert apid.get_apid("propulsion") == 0x04
-    assert apid.get_apid("thermal") == 0x05
-    assert apid.get_apid("adcs") == 0x06
+    assert apid.get_apid("power") == 0x02
+    assert apid.get_apid("comms") == 0x03
+    assert apid.get_apid("thermal") == 0x04
+    assert apid.get_apid("adcs") == 0x05
+    assert apid.get_apid("propulsion") == 0x06
     assert apid.get_apid("payload") == 0x07
     with pytest.raises(apid.ApidError):
         apid.get_apid("unknown")
@@ -30,11 +30,11 @@ def test_get_apid():
 # by the function
 def test_get_subsystem():
     assert apid.get_subsystem(0x01) == "cdh"
-    assert apid.get_subsystem(0x02) == "comms"
-    assert apid.get_subsystem(0x03) == "power"
-    assert apid.get_subsystem(0x04) == "propulsion"
-    assert apid.get_subsystem(0x05) == "thermal"
-    assert apid.get_subsystem(0x06) == "adcs"
+    assert apid.get_subsystem(0x02) == "power"
+    assert apid.get_subsystem(0x03) == "comms"
+    assert apid.get_subsystem(0x04) == "thermal"
+    assert apid.get_subsystem(0x05) == "adcs"
+    assert apid.get_subsystem(0x06) == "propulsion"
     assert apid.get_subsystem(0x07) == "payload"
     with pytest.raises(apid.ApidError):
         apid.get_subsystem(0x08)
@@ -47,11 +47,11 @@ def test_get_all_apids():
     assert isinstance(apids, dict)
     assert len(apids) == 7
     assert apids["cdh"] == 0x01
-    assert apids["comms"] == 0x02
-    assert apids["power"] == 0x03
-    assert apids["propulsion"] == 0x04
-    assert apids["thermal"] == 0x05
-    assert apids["adcs"] == 0x06
+    assert apids["power"] == 0x02
+    assert apids["comms"] == 0x03
+    assert apids["thermal"] == 0x04
+    assert apids["adcs"] == 0x05
+    assert apids["propulsion"] == 0x06
     assert apids["payload"] == 0x07
 
 # test_get_subsystem_list function checks if the list of subsystem names is correctly returned
@@ -62,11 +62,11 @@ def test_get_subsystem_list():
     assert isinstance(subsystems, list)
     assert len(subsystems) == 7
     assert "cdh" in subsystems
-    assert "comms" in subsystems
     assert "power" in subsystems
-    assert "propulsion" in subsystems
+    assert "comms" in subsystems
     assert "thermal" in subsystems
     assert "adcs" in subsystems
+    assert "propulsion" in subsystems
     assert "payload" in subsystems
 
 # test_get_apid_list function checks if the list of APIDs is correctly returned
