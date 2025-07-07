@@ -58,7 +58,7 @@ def transmit_packets(ip=GROUND_IP, port=GROUND_PORT):
                     print(f"[TX] {subsystem.upper()} Packet #{seq_count[subsystem]} → {hex_display}") # Print the packet details
                     seq_count[subsystem] = (seq_count[subsystem] + 1) % 16384 # Increment sequence count, wrap around at 16384
                     last_emit[subsystem] = now # Update the last emit time for this subsystem
-            time.sleep(0.1)  # Prevent busy-waiting
+            time.sleep(0.01)  # Prevent busy-waiting
             
     except KeyboardInterrupt:
         print("\n[RX] Shutdown requested. Closing socket...", flush=True)

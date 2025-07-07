@@ -2,16 +2,6 @@
 # Provide a single source of truth for subsystem Application Process IDs (APIDs)
 # Act as a lookup table so all encoders, decoders, and dashboards can stay consistent
 
-# APIDs for various subsystems
-# These values are defined by the CCSDS standards and may vary by mission or implementation.
-CDH = 0x01
-POWER = 0x02
-COMMS = 0x03
-THERMAL = 0x04
-ADCS = 0x05
-PROPULSION = 0x06
-PAYLOAD = 0x07
-
 # Custom exception for APID handling
 # This exception can be raised for any errors related to APID operations, such as invalid AP
 class ApidError(Exception):
@@ -21,13 +11,13 @@ class ApidError(Exception):
 # Dictionary mapping subsystem names to their APIDs
 # This serves as the single source of truth for APIDs across the system
 apid_dict = {
-    "cdh": CDH,
-    "power": POWER,
-    "comms": COMMS,
-    "thermal": THERMAL,
-    "adcs": ADCS,
-    "propulsion": PROPULSION,
-    "payload": PAYLOAD,
+    "cdh": 0x01,
+    "power": 0x02,
+    "comms": 0x03,
+    "thermal": 0x04,
+    "adcs": 0x05,
+    "propulsion": 0x06,
+    "payload": 0x07,
 }
 
 # get_apid function retrieves the APID for a given subsystem
