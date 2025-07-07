@@ -13,12 +13,12 @@ def get_power_telemetry():
     # Simulate battery metrics
     battery_voltage = round(random.uniform(24.0, 29.4), 2)
     battery_current = round(random.uniform(-5.0, 5.0), 2)  # charge/discharge
-    battery_temp = round(random.uniform(0.0, 35.0), 1)
-    state_of_charge = round(random.uniform(30.0, 100.0), 1)
+    battery_temp = round(random.uniform(0.0, 35.0), 1) # Celsius
+    state_of_charge = round(random.uniform(30.0, 100.0), 1) # Percentage
 
     # Simulate solar array
-    solar_array_current = round(random.uniform(0.0, 8.0), 2)
-    solar_array_voltage = round(random.uniform(26.0, 29.0), 2)
+    solar_array_current = round(random.uniform(0.0, 8.0), 2) # Amps
+    solar_array_voltage = round(random.uniform(26.0, 29.0), 2) # Volts
 
     # Mode and fault
     # EPS Mode (uint8, 0–5)

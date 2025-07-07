@@ -25,6 +25,7 @@ CCSDS 133.0-B (telemetry source packets)
 CDH_STRUCT_FORMAT = ">fffBBfIHBB"
 POWER_STRUCT_FORMAT = ">ffffffffBB"
 COMMS_STRUCT_FORMAT = ">fffffI4B"
+THERMAL_STRUCT_FORMAT = ">fBBBBffB"
 
 def encode_ccsds_cdh_payload(data: dict) -> bytes:
     """
@@ -114,6 +115,46 @@ def encode_ccsds_power_payload(data: dict) -> bytes:
         solar_array_voltage,
         eps_mode,
         fault_flags
+    )
+    
+    return payload
+
+def encode_ccsds_thermal_payload(data: dict) -> bytes:
+    """
+    Encodes Thermal telemetry data into a CCSDS-compliant payload.
+    
+    The struct format is:
+        average_temp        -> float
+        heater_status       -> uint8
+        radiator_status     -> uint8
+        heat_pipe_status    -> uint8
+        thermal_mode        -> uint8
+        hot_spot_temp       -> float
+        cold_spot_temp      -> float
+        thermal_fault_flags -> uint8
+    """
+    
+    # validate/normalize inputs
+    average_temp = float(data['average_temp'])
+    heater_status = int(data['heater_status'])  # 0 or 1
+    radiator_status = int(data['radiator_status'])  # 0 or 1
+    heat_pipe_status = int(data['heat_pipe_status'])  # 0 or 1
+    thermal_mode = int(data['thermal_mode'])  # 0–4
+    hot_spot_temp = float(data['hot_spot_temp'])
+    cold_spot_temp = float(data['cold_spot_temp'])
+    thermal_fault_flags = int(data['thermal_fault_flags'])  # bitfield, 0–255
+    
+    # pack it all in one shot
+    payload = struct.pack(
+        THERMAL_STRUCT_FORMAT,
+        average_temp,
+        heater_status,
+        radiator_status,
+        heat_pipe_status,
+        thermal_mode,
+        hot_spot_temp,
+        cold_spot_temp,
+        thermal_fault_flags
     )
     
     return payload
