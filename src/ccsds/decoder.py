@@ -204,11 +204,9 @@ def decode_secondary_header(packet: bytes) -> dict:
 
 def decode_ccsds_packet(packet: bytes) -> dict:
     primary = decode_primary_header(packet)
+    apid = primary["apid"]
     secondary = decode_secondary_header(packet)
-    payload = decode_payload(packet, primary["apid"])
-
-    if len(packet) != 34:  # or use struct.calcsize(format)
-        raise ValueError(f"[DECODE ERROR] APID 0x03: Expected 34 bytes, got {len(packet)}")
+    payload = decode_payload(packet, apid)
 
     return {
         "primary": primary,

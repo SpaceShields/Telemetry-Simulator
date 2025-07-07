@@ -1,6 +1,7 @@
 import socket
 from src.ccsds.decoder import decode_ccsds_packet
 import struct
+import pprint
 
 def receive_packets():
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -14,7 +15,8 @@ def receive_packets():
             print("[RX] Decoding packet...", flush=True)
             print("==========================", flush=True)
             try:
-                decode_ccsds_packet(data)
+                decoded = decode_ccsds_packet(data)
+                pprint.pprint(decoded, sort_dicts=False)
                 print(f"[RX] Decoded packet successfully with payload length {len(data)}.", flush=True)
             except (ValueError, struct.error) as e:
                 print(f"[RX] Error decoding packet: {e}", flush=True)
