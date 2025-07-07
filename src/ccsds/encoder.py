@@ -26,6 +26,7 @@ CDH_STRUCT_FORMAT = ">fffBBfIHBB"
 POWER_STRUCT_FORMAT = ">ffffffffBB"
 COMMS_STRUCT_FORMAT = ">fffffI4B"
 THERMAL_STRUCT_FORMAT = ">fBBBBffB"
+ADCS_STRUCT_FORMAT = ">ffffffffff4B"
 
 def encode_ccsds_cdh_payload(data: dict) -> bytes:
     """
@@ -205,6 +206,65 @@ def encode_ccsds_comms_payload(data: dict) -> bytes:
     
     return payload
 
+def encode_ccsds_adcs_payload(data: dict) -> bytes:
+    """
+    Encodes ADCS telemetry data into a CCSDS-compliant payload.
+    
+    The struct format is:
+        quat_w             -> float
+        quat_x             -> float
+        quat_y             -> float
+        quat_z             -> float
+        ang_velocity_x     -> float
+        ang_velocity_y     -> float
+        ang_velocity_z     -> float
+        mag_field_x        -> float
+        mag_field_y        -> float
+        mag_field_z        -> float
+        sun_sensor_status  -> uint8
+        gyro_status        -> uint8
+        adcs_mode          -> uint8
+        adcs_fault_flags   -> uint8
+    """
+    
+    # validate/normalize inputs
+    quat_w = float(data['quat_w'])
+    quat_x = float(data['quat_x'])
+    quat_y = float(data['quat_y'])
+    quat_z = float(data['quat_z'])
+    ang_velocity_x = float(data['ang_velocity_x'])
+    ang_velocity_y = float(data['ang_velocity_y'])
+    ang_velocity_z = float(data['ang_velocity_z'])
+    mag_field_x = float(data['mag_field_x'])
+    mag_field_y = float(data['mag_field_y'])
+    mag_field_z = float(data['mag_field_z'])
+    sun_sensor_status = int(data['sun_sensor_status'])  # 0 or 1
+    gyro_status = int(data['gyro_status'])  # 0 or 1
+    adcs_mode = int(data['adcs_mode'])  # 0–4
+    adcs_fault_flags = int(data['adcs_fault_flags'])  # bitfield, 0–255
+    
+    # pack it all in one shot
+    payload = struct.pack(
+        ADCS_STRUCT_FORMAT,
+        quat_w,
+        quat_x,
+        quat_y,
+        quat_z,
+        ang_velocity_x,
+        ang_velocity_y,
+        ang_velocity_z,
+        mag_field_x,
+        mag_field_y,
+        mag_field_z,
+        sun_sensor_status,
+        gyro_status,
+        adcs_mode,
+        adcs_fault_flags
+    )
+    
+    return payload
+
+# Placeholders
 def encode_ccsds_primary_header() -> bytes:
     """
     Fields:
@@ -233,7 +293,6 @@ def encode_ccsds_secondary_header() -> bytes:
     integrate directly without hardcoding
     """
     pass
-
 
 def crc_generator() -> bytes:
     """
