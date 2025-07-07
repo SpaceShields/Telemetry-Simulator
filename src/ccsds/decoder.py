@@ -15,6 +15,16 @@ ADCS_STRUCT_FORMAT = ">ffffffffff4B" # bytes = 44 (total w/headers and CRC = 56)
 PROPULSION_STRUCT_FORMAT = ">ffff4BffBB" # bytes = 30 (total w/headers and CRC = 42)
 PAYLOAD_STRUCT_FORMAT = ">BBHBffBB" # bytes = 15 (total w/headers and CRC = 27)
 
+PAYLOAD_LENGTHS = {
+    0x01: 26,  # CDH
+    0x02: 34,  # Power
+    0x03: 28,  # Comms
+    0x04: 17,  # Thermal
+    0x05: 44,  # ADCS
+    0x06: 30,  # Propulsion
+    0x07: 15   # Payload
+}
+
 def decode_ccsds_adcs_payload(payload: bytes) -> dict:
     """
     Decode the ADCS payload to verify correctness.
@@ -153,7 +163,14 @@ DECODE_ROUTER = {
 def decode_payload(packet: bytes, apid: int) -> dict:
     if apid not in DECODE_ROUTER:
         raise ValueError(f"Unsupported APID: {apid}")
-    return DECODE_ROUTER[apid](packet[10:-2])  # skip headers, exclude CRC
+    
+    expected_len = PAYLOAD_LENGTHS[apid]
+    actual_payload = packet[10:-2]
+
+    if len(actual_payload) != expected_len:
+        raise ValueError(f"[DECODE ERROR] APID {apid:#04x}: Expected {expected_len} bytes, got {len(actual_payload)} bytes")
+    
+    return DECODE_ROUTER[apid](actual_payload)
 
 def decode_primary_header(packet: bytes) -> dict:
     version_type_apid, seq_flags_count, length = struct.unpack('>HHH', packet[:6])
