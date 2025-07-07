@@ -1,5 +1,5 @@
 import socket
-from src.ccsds.decoder import decode_ccsds_packet, print_decoded_packet
+from src.ccsds.decoder import decode_ccsds_packet
 
 def receive_packets():
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
