@@ -12,9 +12,13 @@ def receive_packets():
             print(f"[RX] Received {len(data)} bytes from {addr} -> {hex_display}", flush=True)
             print("[RX] Decoding packet...", flush=True)
             print("==========================", flush=True)
-            decoded_data = decode_ccsds_packet(data)
-            print(decoded_data, flush=True)
-            print("[RX] Decoded packet successfully.", flush=True)
+            try:
+                decoded_data = decode_ccsds_packet(data)
+                print(decoded_data, flush=True)
+                print("[RX] Decoded packet successfully.", flush=True)
+            except ValueError as e:
+                print(f"[RX] Error decoding packet: {e}", flush=True)
+                continue
             print("===========================", flush=True)
     except KeyboardInterrupt:
         print("\n[RX] Shutdown requested. Closing socket...", flush=True)

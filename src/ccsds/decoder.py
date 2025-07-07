@@ -150,9 +150,11 @@ def decode_primary_header(packet: bytes) -> dict:
     seq_count = seq_flags_count & 0x3FFF
     apid = version_type_apid & 0x07FF
 
-    if len(packet) != 38:
-        raise ValueError("Invalid CCSDS packet length")
-
+    # Extract length field from header (already unpacked above)
+    expected_packet_length = length + 1 + 6  # +1 as per CCSDS standard, +6 for primary header
+    if len(packet) < expected_packet_length:
+        raise ValueError(f"Incomplete CCSDS packet. Expected {expected_packet_length}, got {len(packet)}")
+    
     return {
         "version": version,
         "pkt_type": pkt_type,
