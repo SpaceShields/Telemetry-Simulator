@@ -7,13 +7,13 @@ from datetime import datetime
 # I: uint32 (4 bytes)
 # H: uint16 (2 bytes)
 # B: uint8 (1 byte)
-CDH_STRUCT_FORMAT = ">fffBBfIHBB"
-POWER_STRUCT_FORMAT = ">ffffffffBB"
-COMMS_STRUCT_FORMAT = ">fffffI4B"
-THERMAL_STRUCT_FORMAT = ">fBBBBffB"
-ADCS_STRUCT_FORMAT = ">ffffffffff4B"
-PROPULSION_STRUCT_FORMAT = ">ffff4BffBB"
-PAYLOAD_STRUCT_FORMAT = ">BBHBffBB"
+CDH_STRUCT_FORMAT = ">fffBBfIHBB" # bytes = 26 (total w/headers and CRC = 38)
+POWER_STRUCT_FORMAT = ">ffffffffBB" # bytes = 34 (total w/headers and CRC = 46)
+COMMS_STRUCT_FORMAT = ">fffffI4B" # bytes = 28 (total w/headers and CRC = 40)
+THERMAL_STRUCT_FORMAT = ">fBBBBffB" # bytes = 17 (total w/headers and CRC = 29)
+ADCS_STRUCT_FORMAT = ">ffffffffff4B" # bytes = 44 (total w/headers and CRC = 56)
+PROPULSION_STRUCT_FORMAT = ">ffff4BffBB" # bytes = 30 (total w/headers and CRC = 42)
+PAYLOAD_STRUCT_FORMAT = ">BBHBffBB" # bytes = 15 (total w/headers and CRC = 27)
 
 def decode_ccsds_adcs_payload(payload: bytes) -> dict:
     """

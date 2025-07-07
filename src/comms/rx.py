@@ -19,6 +19,7 @@ def receive_packets():
                 print("[RX] Decoded packet successfully.", flush=True)
             except (ValueError, struct.error) as e:
                 print(f"[RX] Error decoding packet: {e}", flush=True)
+                print("===========================", flush=True)
                 continue
             print("===========================", flush=True)
     except KeyboardInterrupt:
