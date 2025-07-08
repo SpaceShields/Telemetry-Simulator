@@ -3,22 +3,12 @@
 <head>
   <title>Mission Control Dashboard</title>
   <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
-  <style>
-    body { font-family: monospace; background: #111; }
-    .panel { padding: 20px; margin: 10px; border: 1px solid white; color:white; border-radius: 50px; }
-    .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
-    h1 { color: #0ff; }
-  </style>
+  <link rel="stylesheet" href="../static/styles.css">
+  <link rel="icon" href="../static/favicon.ico" type="image/x-icon">
 </head>
 <body>
-  <h1>🚀 Mission Control: Pi Telemetry</h1>
+  <h1>🚀 Mission Control</h1>
   <div class="grid">
-    <div class="panel" id="cpu_temp"></div>
-    <div class="panel" id="cpu_usage"></div>
-    <div class="panel" id="ram"></div>
-    <div class="panel" id="disk"></div>
-    <div class="panel" id="fan"></div>
-    <div class="panel" id="uptime"></div>
   </div>
 
   <script>

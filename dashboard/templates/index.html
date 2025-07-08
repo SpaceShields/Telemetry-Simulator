@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Mission Control</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="../static/css/styles.css">
+  <link rel="icon" href="../static/assets/favicon.ico" type="image/x-icon">
+  <script src="https://cdn.socket.io/4.5.4/socket.io.min.js" defer></script>
+  <script src="../static/js/main.js" defer></script>
+</head>
+<body>
+  <header class="top-bar-wrap">
+    <h1 class="top-bar-title"><a href="/">Mission Control</a></h1>
+    <img src="../static/assets/logo.png" alt="Mission Control Logo" class="logo">
+  </header>
+
+  <main>
+    <section class="flex-container-wrap">
+      <h2>Spacecraft Status</h2>
+      <div id="status-container" class="status-main-yellow"></div>
+    </section>
+    <p id="status-text">waiting for telemetry...</p>
+
+    <section class="grid" id="subsystem-grid">
+      <!-- Panels inserted dynamically here -->
+    </section>
+  </main>
+</body>
+</html>

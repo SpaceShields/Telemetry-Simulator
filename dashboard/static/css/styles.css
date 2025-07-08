@@ -1,0 +1,130 @@
+body {
+  font-family: monospace;
+  background: #111;
+  padding: 0;
+  margin: 0;
+}
+
+a, a:visited, a:hover, a:active, a:focus {
+   color: white !important;
+   text-decoration: none !important;
+   outline: none !important;
+}
+
+.top-bar-wrap {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  height: 40px;
+  color: white;
+  padding: 10px;
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
+}
+
+.top-bar-title {
+  color: #0ff;
+  margin-right: 10px;
+  font-size: 1.5em;
+}
+
+.logo {
+  height: 24px;
+}
+
+.flex-container-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  color: white;
+}
+
+#status-container {
+  border-radius: 50%;
+  height: 20px;
+  width: 20px;
+}
+
+#status-text {
+  color: rgb(158, 158, 158);
+  font-size: 1.1em;
+  text-align: center;
+}
+
+/* Subsystem grid */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 15px;
+  padding: 20px;
+}
+
+/* Panel */
+.panel {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  margin: 5px;
+  border: 1px solid white;
+  color: white;
+  border-radius: 50px;
+  background: rgba(0, 0, 0, 0.5);
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.25);
+}
+
+/* Label inside each panel */
+.panel-label {
+  font-weight: bold;
+}
+
+/* Base for subsystem lights */
+.status-light {
+  border-radius: 50%;
+  height: 10px;
+  width: 10px;
+}
+
+/* Subsystem lights */
+.status-subsystem-green {
+  background-color: green;
+  box-shadow: 0 0 5px rgba(0, 255, 0, 0.5);
+}
+
+.status-subsystem-yellow {
+  background-color: yellow;
+  box-shadow: 0 0 5px rgba(255, 255, 0, 0.5);
+}
+
+.status-subsystem-red {
+  background-color: red;
+  box-shadow: 0 0 5px rgba(255, 0, 0, 0.5);
+}
+
+/* Main status lights (larger) */
+.status-main-green {
+  background-color: green;
+  box-shadow: 0 0 10px rgba(174, 255, 174, 0.5);
+}
+
+.status-main-yellow {
+  background-color: yellow;
+  box-shadow: 0 0 10px rgba(255, 255, 174, 0.5);
+}
+
+.status-main-red {
+  background-color: red;
+  box-shadow: 0 0 10px rgba(255, 174, 174, 0.5);
+}
+
+/* Responsive spacing */
+@media screen and (max-width: 600px) {
+  .top-bar-title {
+    font-size: 1.2em;
+  }
+  .flex-container-wrap {
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+  }
+}
