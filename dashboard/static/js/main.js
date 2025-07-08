@@ -1,35 +1,11 @@
 const socket = io();
 
-socket.on('telemetry', data => {
-    const { subsystem, status, payload } = data;
-    const grid = document.querySelector(".grid");
-    let panel = document.getElementById(subsystem);
+const grid = document.getElementById("subsystem-grid") || document.querySelector(".grid");
+const statusContainer = document.getElementById("status-container");
+const statusText = document.getElementById("status-text");
 
-    // Create panel if it doesn't exist
-    if (!panel) {
-        panel = document.createElement("div");
-        panel.className = "panel";
-        panel.id = subsystem;
-
-        const label = document.createElement("span");
-        label.className = "panel-label";
-        label.textContent = subsystem;
-
-        const statusLight = document.createElement("div");
-        statusLight.className = getStatusClass(status);
-        statusLight.classList.add("status-light");
-
-        panel.appendChild(label);
-        panel.appendChild(statusLight);
-        grid.appendChild(panel);
-    } else {
-        // Update existing panel
-        const light = panel.querySelector(".status-light");
-        if (light) light.className = `status-light ${getStatusClass(status)}`;
-    }
-
-    updateMainStatus();
-});
+const subsystemPanels = {};
+const subsystemTimestamps = {};
 
 function getStatusClass(status) {
     switch (status) {
@@ -39,22 +15,104 @@ function getStatusClass(status) {
     }
 }
 
-function updateMainStatus() {
-    const panels = document.getElementsByClassName("panel");
-    const statusContainer = document.getElementById("status-container");
+function createStatusLight(status) {
+    const light = document.createElement("div");
+    light.className = `status-light ${getStatusClass(status)}`;
+    return light;
+}
 
-    if (panels.length < 7) {
+function createPanel(subsystem) {
+    const panel = document.createElement("div");
+    panel.className = "panel";
+    panel.id = `panel-${subsystem}`;
+    panel.dataset.status = "unknown";
+
+    const label = document.createElement("h2");
+    label.textContent = subsystem.toUpperCase();
+    label.className = "panel-label";
+
+    const statusLight = createStatusLight("unknown");
+    statusLight.classList.add("status-light");
+
+    const timeInfo = document.createElement("p");
+    timeInfo.className = "panel-timestamp";
+    timeInfo.textContent = "--";
+
+    const seqInfo = document.createElement("p");
+    seqInfo.className = "panel-sequence";
+    seqInfo.textContent = "#--";
+
+    // const detailsLink = document.createElement("a");
+    // detailsLink.href = `/subsystem/${subsystem}`;
+    // detailsLink.className = "panel-link";
+    // detailsLink.textContent = "View details →";
+
+    panel.append(label, statusLight, timeInfo, seqInfo);
+    panel.addEventListener('click', () => {
+            window.location.href = `/${subsystem}`;
+        });
+    grid.appendChild(panel);
+    subsystemPanels[subsystem] = panel;
+
+    return panel;
+}
+
+function updateOverallStatus() {
+    const total = Object.values(subsystemPanels).length;
+    const red = Object.values(subsystemPanels).filter(p => p.dataset.status === "emergency").length;
+
+    if (total < 7) {
         statusContainer.className = "status-main-yellow";
-        return;
+        statusText.textContent = "partial link";
+    } else if (red > 0) {
+        statusContainer.className = "status-main-red";
+        statusText.textContent = "emergency";
     } else {
-        document.getElementById("status-text").textContent = "Subsystems Online";
+        statusContainer.className = "status-main-green";
+        statusText.textContent = "nominal";
+    }
+}
+
+function updatePanel(packet) {
+    const { subsystem, timestamp, status, sequence_count, data  } = packet;
+    const currentTimestamp = Date.now();
+    subsystemTimestamps[subsystem] = currentTimestamp;
+
+    const panel = subsystemPanels[subsystem] || createPanel(subsystem);
+    panel.dataset.status = status;
+
+    // Update status light
+    const existingLight = panel.querySelector(".status-light");
+    if (existingLight) {
+        existingLight.className = `status-light ${getStatusClass(status)}`;
     }
 
-    const anyRed = Array.from(panels).some(panel =>
-        panel.querySelector(".status-subsystem-red")
-    );
+    // Update sequence
+    const seqInfo = panel.querySelector(".panel-sequence");
+    if (seqInfo) {
+        seqInfo.textContent = `#${sequence_count || "--"}`;
+    }
 
-    statusContainer.className = anyRed
-        ? "status-main-red"
-        : "status-main-green";
+    updateOverallStatus();
 }
+
+function updateTimestamps() {
+    const now = Date.now();
+    for (const [subsystem, ts] of Object.entries(subsystemTimestamps)) {
+        const panel = subsystemPanels[subsystem];
+        if (!panel) continue;
+
+        const elapsedSec = Math.floor((now - ts) / 1000);
+        const timeInfo = panel.querySelector(".panel-timestamp");
+        if (timeInfo) {
+            timeInfo.textContent = `${elapsedSec}s ago`;
+        }
+    }
+    requestAnimationFrame(updateTimestamps);
+}
+
+socket.on("telemetry", data => {
+    updatePanel(data);
+});
+
+requestAnimationFrame(updateTimestamps);

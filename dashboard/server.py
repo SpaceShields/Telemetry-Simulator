@@ -31,6 +31,7 @@ def udp_listener():
             "subsystem": get_subsystem(decoded["primary"]["apid"]).upper(),
             "timestamp": decoded["secondary"]["timestamp"],
             "status": "nominal",
+            "sequence_count": decoded["primary"]["seq_count"],
             "data": decoded["payload"]
         }
 
