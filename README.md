@@ -1,123 +1,141 @@
-# 🛰️Telemetry-Simulator
-
-A real-time telemetry simulation framework that emulates spacecraft downlink using CCSDS-compliant packets from a Raspberry Pi-5 "spacecraft" to a mission control ground station dashboard.
-
-Built for rapid prototyping, operator visualization, and low-cost flight-like testing environments.
+Here’s a clean and updated `README.md` for your **Telemetry Simulator + Mission Control Dashboard** project, tailored to the current state of your working MVP:
 
 ---
 
-## Overview
+````markdown
+# 🛰️ Spacecraft Telemetry Simulator & Mission Control Dashboard
 
-This project simulates real-time spacecraft telemetry from a Raspberry Pi system using realistic packet encoding, UDP downlink, and a Flask-based mission control dashboard with a modern web interface.
+A fully operational MVP that simulates real-time spacecraft telemetry via CCSDS packets, transmits over UDP, decodes on a ground station, and displays subsystem health in a responsive, minimalist web dashboard.
 
-- Encodes and transmits CCSDS-formatted packets
-- Transmits real Pi system telemetry (CPU temp, RAM, fan speed, uptime)
-- Streams data over UDP from spacecraft to ground
-- Decodes and displays live telemetry in a mission-style dashboard
-- Modular design for extension to multiple subsystems
+## 📦 Features
+
+- 🔁 CCSDS-compliant packet encoding/decoding
+- 📡 Real-time telemetry transmission (UDP-based)
+- 🧠 Subsystem simulation (CDH, POWER, COMMS, ADCS, THERMAL, PROPULSION, PAYLOAD)
+- 🧾 CRC validation and sequence tracking
+- 🌐 Dynamic mission control dashboard with:
+  - Subsystem health indicators
+  - Sequence counters
+  - Time since last packet
+  - Status-responsive pulsing lights
+  - Panel routing for detailed subsystem views
 
 ---
 
-## 📁 Project Structure
+## 🗂️ Project Structure
 
-```
-
-TLI-Telemetry-Simulator/
-├── src/                        # Core packet encoding and Pi telemetry
-│   ├── pi_reader.py
-│   |── receiver.py
-│   |── transmitter.py
-│   ├── packet_encoder.py
-│   └── packet_decoder.py
+```text
+project-root/
 │
-├── dashboard/                  # Mission control dashboard (Flask)
-│   ├── server.py
-│   ├── templates/
-│   │   └── dashboard.html
-│   └── static/                 # Optional: custom CSS/JS
+├── src/
+│   ├── ccsds/                # Encoder, decoder, APID management
+│   ├── subsystems/           # Individual subsystem telemetry simulation
+│   ├── static/
+│   │   ├── css/              # styles.css
+│   │   ├── js/               # main.js
+│   │   └── assets/           # logo, icons
+│   ├── templates/            # index.html (served by server.py)
+│   ├── rx.py                 # Receiver: decodes and relays via WebSocket
+│   ├── tx.py                 # Transmitter: encodes and sends packets via UDP
+│   └── server.py             # WebSocket + static server
 │
-├── run_transmitter.py         # RPi telemetry loop
-├── run_groundstation.py       # CLI receiver loop
-├── .env                       # IP/port configuration
-├── requirements.txt
+├── .env                      # Configuration (IP/PORT)
+├── requirements.txt          # Python dependencies
 └── README.md
-```
-
----
-
-## ⚙️ Setup
-
-### 1. Install Dependencies
-
-```bash
-pip install -r requirements.txt
 ````
 
-### 2. Add `.env` File
+---
 
-Create a `.env` in the root with:
+## 🚀 Getting Started
+
+### 1. Clone & Install
+
+```bash
+git clone https://github.com/yourusername/telemetry-dashboard.git
+cd telemetry-dashboard
+python3 -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+```
+
+### 2. Configure `.env`
 
 ```env
-GROUND_IP=[YOUR DESIRED RECEIVER IP]
-GROUND_PORT=[YOUR DESIRED PORT | DEFAULT=5005]
+GROUND_IP=127.0.0.1
+GROUND_PORT=5005
 ```
 
-> Your Pi must send to this IP and port.
+### 3. Run the Simulator
+
+In one terminal:
+
+```bash
+python src/rx.py     # Receiver/Decoder (Ground Station)
+```
+
+In another:
+
+```bash
+python src/tx.py     # Transmitter (Spacecraft Simulator)
+```
+
+### 4. Launch the Dashboard
+
+In a third terminal:
+
+```bash
+python src/server.py
+```
+
+Open in browser:
+`http://localhost:8000`
 
 ---
 
-## 🔄 Usage
+## 🧪 Tests
 
-### Transmit Telemetry from RPi
-
-```bash
-python run_transmitter.py
-```
-
-### Receive via CLI
+Basic encoding/decoding test coverage is provided in the `tests/` directory.
+Run with:
 
 ```bash
-python run_groundstation.py
+pytest
 ```
-
-### Run Web Dashboard
-
-```bash
-cd dashboard
-python server.py
-```
-
-** Web dashboard and CLI receiver should not be ran at the same time
-
-Then open [http://localhost:8000](http://localhost:8000) in your browser.
 
 ---
 
-## 📦 Packet Format (38 bytes)
+## 🧰 Tech Stack
 
-| Section          | Length | Details                   |
-| ---------------- | ------ | ------------------------- |
-| Primary Header   | 6 B    | CCSDS standard            |
-| Secondary Header | 4 B    | UNIX timestamp (uint32)   |
-| Payload          | 28 B   | 6 floats + 1 int (uptime) |
-
-Payload includes:
-
-* `cpu_temp` (°C), `cpu_freq` (MHz), `cpu_usage` (%)
-* `ram` (%), `disk_usage` (%), `fan_speed` (RPM)
-* `uptime` (sec, uint32)
+* **Python**: Socket, Struct, psutil
+* **Socket.IO**: Real-time server → browser data feed
+* **HTML/CSS/JS**: Minimalist static frontend
+* **Vanilla JS**: Dynamic grid injection, status logic
+* **CCSDS 133.0-B.1**: Packet structure compliance
 
 ---
 
-## ✅ Roadmap
+## 📌 TODO Roadmap
 
-* [ ] Add Chart.js visualization
-* [ ] Add APID filtering for subsystems
-* [ ] Add logging to CSV/SQLite
-* [ ] Add fault injection & alerts
+* [x] Pulse animation for status lights
+* [x] Subsystem routing via panel click
+* [ ] Subsystem chart views (D3/Chart.js)
+* [ ] Packet logging & historical data
+* [ ] Fault simulation injection
+* [ ] Subsystem drill-down diagnostics
+
+---
+
+## 📷 Preview
+
+![Mission Control Dashboard](static/assets/dashboard-preview.png)
+
+---
+
+## 🛰️ Author
+
+Developed by Andrew Shields
 
 ---
 
 ## 📜 License
 
-MIT — Use freely for simulation, research, and flight prototyping.
+MIT License – free to use, modify, and launch your own mission.
