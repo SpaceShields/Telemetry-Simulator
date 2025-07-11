@@ -1,8 +1,3 @@
-Here’s a clean and updated `README.md` for your **Telemetry Simulator + Mission Control Dashboard** project, tailored to the current state of your working MVP:
-
----
-
-````markdown
 # 🛰️ Spacecraft Telemetry Simulator & Mission Control Dashboard
 
 A fully operational MVP that simulates real-time spacecraft telemetry via CCSDS packets, transmits over UDP, decodes on a ground station, and displays subsystem health in a responsive, minimalist web dashboard.
